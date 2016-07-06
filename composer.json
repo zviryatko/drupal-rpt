@@ -1,0 +1,26 @@
+{
+  "name": "drupal/rpt",
+  "type": "drupal-module",
+  "description": "Registration Password Token",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/rpt",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "http://drupal.org/project/issues/rpt",
+    "source": "http://cgit.drupalcode.org/rpt"
+  },
+  "require": { },
+  "authors": [
+    {
+      "name": "Maslouski Yauheni (Spleshka)",
+      "homepage": "https://www.drupal.org/u/spleshka",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Alex Davyskiba (zviryatko)",
+      "email": "sanya.davyskiba@gmail.com",
+      "homepage": "https://www.drupal.org/u/zviryatko"
+    }
+  ]
+}

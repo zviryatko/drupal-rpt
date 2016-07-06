@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Enables the user registration password token.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function rpt_config_schema_info_alter(&$definitions) {
+  $definitions['user.settings']['rpt_password_generate'] = [
+    'type' => 'boolean',
+    'label' => 'Generate password automatically',
+  ];
+  $definitions['user.settings']['rpt_password_length'] = [
+    'type' => 'integer',
+    'label' => 'Password length',
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add checkbox with setting of password automatic generation.
+ */
+function rpt_form_user_admin_settings_alter(&$form, FormStateInterface $form_state) {
+  $config = \Drupal::config('user.settings');
+  $form['registration_cancellation']['rpt_password_generate'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Generate password automatically'),
+    '#description' => t('Hide password fields on user register form.'),
+    '#default_value' => $config->get('rpt_password_generate'),
+    '#weight' => 10,
+  );
+  $form['registration_cancellation']['rpt_password_length'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Password length'),
+    '#description' => t('Length for generated password.'),
+    '#default_value' => $config->get('rpt_password_length'),
+    '#weight' => 11,
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Hide password field and generate password for user.
+ */
+function rpt_form_user_register_form_alter(&$form, FormStateInterface $form_state) {
+  $config = \Drupal::config('user.settings');
+  if ($config->get('rpt_password_generate')) {
+    $form['account']['pass']['#type'] = 'value';
+    $form['account']['pass']['#value'] = user_password($config->get('rpt_password_length'));
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function rpt_token_info() {
+  $info['tokens']['user']['password'] = array(
+    'name' => t('User password'),
+    'description' => t('Provides user password. May be used only during registration.'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function rpt_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = array();
+  if (isset($data['user']) && isset($data['user']->password)) {
+    $replacements['[user:password]'] = $data['user']->password;
+  }
+  elseif (isset($data['user']) && !isset($data['user']->password)) {
+    $replacements['[user:password]'] = t('Your password');
+  }
+  return $replacements;
+}

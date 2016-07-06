@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the rpt module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function rpt_install() {
+  $config = \Drupal::configFactory()->getEditable('user.settings');
+  $config->set('rpt_password_generate', TRUE);
+  $config->set('rpt_password_length', 11);
+  $config->save(TRUE);
+
+  $mail_config = \Drupal::configFactory()->getEditable('user.mail');
+  $keys = [
+    'register_admin_created',
+    'register_no_approval_required',
+    'status_activated',
+  ];
+  foreach ($keys as $key) {
+    $data = str_replace('Your password', '[user:password]', $mail_config->get($key));
+    $mail_config->set($key, $data);
+  }
+  $mail_config->save(TRUE);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function rpt_uninstall() {
+  $mail_config = \Drupal::configFactory()->getEditable('user.mail');
+  $keys = [
+    'register_admin_created',
+    'register_no_approval_required',
+    'status_activated',
+  ];
+  foreach ($keys as $key) {
+    $data = str_replace('[user:password]', t('Your password'), $mail_config->get($key));
+    $mail_config->set($key, $data);
+  }
+  $mail_config->save(TRUE);
+}

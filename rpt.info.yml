@@ -1,0 +1,6 @@
+name: Registration Password Token
+type: module
+description: Provides user password token during registration.
+core: 8.x
+package: User Access & Authentication
+configure: entity.user.admin_form
